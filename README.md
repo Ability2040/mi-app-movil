@@ -29,10 +29,13 @@ Versionamiento por ramas
 - `Joel` → Joel
 
 
-## 🎨 Wireframes/Mockups y Diagrama de flujo
+## 🎨 Wireframes/Mockups 
 Puedes visualizar los wireframes de la aplicación en los siguientes enlaces:  
 - [🎨 Diseño en Figma](https://www.figma.com/design/KC9NbaHgOQnRA2Sf7iZi3x/AgendaProject-(Copy))  
-- [📱 Prototipo interactivo](https://www.figma.com/proto/KC9NbaHgOQnRA2Sf7iZi3x/AgendaProject-(Copy)?node-id=181-3604&p=f&t=gc643fMwi9xs5Oeu-1&scaling=scale-down&content-scaling=fixed&page-id=181%3A3592&starting-point-node-id=181%3A3621)  
+- [📱 Prototipo interactivo](https://www.figma.com/proto/KC9NbaHgOQnRA2Sf7iZi3x/AgendaProject-(Copy)?node-id=181-3604&p=f&t=gc643fMwi9xs5Oeu-1&scaling=scale-down&content-scaling=fixed&page-id=181%3A3592&starting-point-node-id=181%3A3621)
+
+## Diagrama de flujo
+- Se agrego a la carpeta Diseños
 
 
 ## 📂 Repositorio GitHub  
