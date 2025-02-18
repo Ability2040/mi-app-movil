@@ -1,4 +1,4 @@
-# 📱 Nombre de la Aplicación: IventUp
+# 📱 Nombre de la Aplicación: EventUp
 **Descripción:** La aplicación IventUp permite a los usuarios crear, organizar y dar seguimiento a sus eventos diarias de forma sencilla.
 Con una interfaz simple e intuitiva, los usuarios pueden categorizar sus eventos, establecer prioridades y fechas de vencimiento, lo que facilita
 una mejor gestión del tiempo y el cumplimiento de objetivos. Ideal para personas que buscan mejorar su productividad personal o en equipo. 
