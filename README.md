@@ -9,7 +9,7 @@ mantenerse organizados al permitirles crear, categorizar y seguir el progreso de
 tiene como propósito facilitar la visualización y priorización de eventos, optimizando el tiempo y los esfuerzos para cumplir con los objetivos diarios.
 
 ## 🏗️ Arquitectura de la Aplicación
-- Tipo de arquitectura: Monolítica
+- Tipo de arquitectura: Estructura Modular
 
 - Justificación: Se eligió una arquitectura monolítica para simplificar el desarrollo y mantenimiento de la aplicación en esta fase inicial. Al ser una aplicación 
 pequeña y con pocos requerimientos complejos, una arquitectura monolítica permite un desarrollo más rápido, sin necesidad de gestionar múltiples servicios o 
