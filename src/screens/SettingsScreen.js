@@ -148,7 +148,7 @@ const SettingsScreen = ({ navigation }) => {
             icon="key-outline"
             title="Cambiar contraseña"
             type="arrow"
-            onPress={() => navigation.navigate('ForgotPassword')}
+            onPress={() => navigation.navigate('ForgotPasswordScreen')}
           />
         </SettingSection>
         

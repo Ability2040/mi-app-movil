@@ -10,9 +10,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert
+  Alert,
+  Animated
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -20,6 +22,8 @@ const LoginScreen = ({ navigation }) => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [shakeAnimation] = useState(new Animated.Value(0));
   const { login, error, isLoading, clearError } = useAuth();
 
   // Limpiar errores cuando se desmonta el componente
@@ -33,6 +37,7 @@ const LoginScreen = ({ navigation }) => {
   useEffect(() => {
     if (error) {
       setLoginError(error);
+      startShakeAnimation();
     }
   }, [error]);
 
@@ -46,6 +51,15 @@ const LoginScreen = ({ navigation }) => {
     setPasswordError('');
     setLoginError('');
   }, [password]);
+
+  const startShakeAnimation = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: -10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 0, duration: 50, useNativeDriver: true })
+    ]).start();
+  };
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,6 +89,8 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     // Limpiar errores previos
     setLoginError('');
+    setEmailError('');
+    setPasswordError('');
     
     // Validar campos
     const isEmailValid = validateEmail(email);
@@ -88,17 +104,56 @@ const LoginScreen = ({ navigation }) => {
       const success = await login(email, password);
       
       if (!success) {
-        // Si login devuelve false pero no hay error en el contexto
-        if (!error) {
-          setLoginError('Error al iniciar sesión. Comprueba tus credenciales e intenta de nuevo.');
+        // Interpretar el error según su contenido
+        if (error) {
+          console.log('Error de inicio de sesión:', error);
+          // Añadir más condiciones para capturar diferentes formatos de error
+          if (error.toLowerCase().includes('no encontrado') || 
+              error.toLowerCase().includes('no existe') || 
+              error.toLowerCase().includes('no registrado') || 
+              error.toLowerCase().includes('not found')) {
+            setEmailError('Este correo no está registrado');
+            startShakeAnimation();
+          } else if (error.toLowerCase().includes('contraseña') || 
+                    error.toLowerCase().includes('password') || 
+                    error.toLowerCase().includes('credenciales') || 
+                    error.toLowerCase().includes('incorrecta') || 
+                    error.toLowerCase().includes('invalid')) {
+            setPasswordError('Contraseña incorrecta');
+            startShakeAnimation();
+          } else {
+            setLoginError(error);
+            startShakeAnimation();
+          }
         } else {
-          setLoginError(error);
+          // Si no hay mensaje específico, mostrar mensaje genérico
+          setLoginError('Error al iniciar sesión. Comprueba tus credenciales e intenta de nuevo.');
+          startShakeAnimation();
         }
       }
     } catch (err) {
-      setLoginError('Ha ocurrido un error. Por favor, intenta de nuevo más tarde.');
       console.error('Login error:', err);
+      
+      // Analizar el error para dar feedback más específico
+      const errorMsg = err.message || 'Error desconocido';
+      
+      if (errorMsg.toLowerCase().includes('network') || 
+          errorMsg.toLowerCase().includes('red') || 
+          errorMsg.toLowerCase().includes('conexión')) {
+        setLoginError('Error de conexión. Verifica tu conexión a internet.');
+      } else if (errorMsg.toLowerCase().includes('timeout') || 
+                errorMsg.toLowerCase().includes('tiempo')) {
+        setLoginError('Tiempo de espera agotado. Intenta de nuevo más tarde.');
+      } else {
+        setLoginError('Ha ocurrido un error. Por favor, intenta de nuevo más tarde.');
+      }
+      
+      startShakeAnimation();
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -123,23 +178,32 @@ const LoginScreen = ({ navigation }) => {
 
         {/* Mostrar error general de inicio de sesión */}
         {loginError ? (
-          <View style={styles.errorContainer}>
+          <Animated.View 
+            style={[
+              styles.errorContainer,
+              { transform: [{ translateX: shakeAnimation }] }
+            ]}
+          >
+            <Ionicons name="alert-circle" size={20} color="#ff4757" />
             <Text style={styles.errorText}>{loginError}</Text>
-          </View>
+          </Animated.View>
         ) : null}
 
         <View style={styles.formContainer}>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Correo electrónico</Text>
-            <TextInput
-              style={[styles.input, emailError ? styles.inputError : null]}
-              placeholder="Correo electrónico"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              testID="email-input"
-            />
+            <View style={[styles.inputContainer, emailError ? styles.inputContainerError : null]}>
+              <Ionicons name="mail-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Correo electrónico"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                testID="email-input"
+              />
+            </View>
             {emailError ? (
               <Text style={styles.errorText}>{emailError}</Text>
             ) : (
@@ -149,14 +213,24 @@ const LoginScreen = ({ navigation }) => {
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              placeholder="Contraseña"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              testID="password-input"
-            />
+            <View style={[styles.inputContainer, passwordError ? styles.inputContainerError : null]}>
+              <Ionicons name="lock-closed-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                testID="password-input"
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
+                <Ionicons 
+                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                  size={20} 
+                  color="#999" 
+                />
+              </TouchableOpacity>
+            </View>
             {passwordError ? (
               <Text style={styles.errorText}>{passwordError}</Text>
             ) : (
@@ -172,16 +246,16 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleLogin}
-            disabled={isLoading}
-            testID="login-button">
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Continuar</Text>
-            )}
-          </TouchableOpacity>
+  style={[styles.primaryButton, (emailError || passwordError) && styles.disabledButton]}
+  onPress={handleLogin}
+  disabled={isLoading || !!emailError || !!passwordError}
+  testID="login-button">
+  {isLoading ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={styles.buttonText}>Continuar</Text>
+  )}
+</TouchableOpacity>
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('Register')}
@@ -242,17 +316,28 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 50,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    paddingHorizontal: 15,
     backgroundColor: '#fff',
-    fontSize: 16,
   },
-  inputError: {
+  inputContainerError: {
     borderColor: '#ff4757',
+  },
+  inputIcon: {
+    marginLeft: 15,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
   helperText: {
     fontSize: 12,
@@ -265,6 +350,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#ffe8e8',
     borderWidth: 1,
     borderColor: '#ff4757',
@@ -292,6 +379,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
+  },
+  disabledButton: {
+    backgroundColor: '#a29bea',
   },
   buttonText: {
     color: '#fff',

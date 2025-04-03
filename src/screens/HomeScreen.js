@@ -97,8 +97,18 @@ const EventCard = ({ event, onPress }) => {
 
   // Formatear fecha
   const formatDate = (dateString) => {
-    const options = { hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleTimeString('es-ES', options);
+    if (!dateString) return '12:00 pm';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '12:00 pm'; // Para fechas inválidas
+      
+      const options = { hour: '2-digit', minute: '2-digit' };
+      return date.toLocaleTimeString('es-ES', options);
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '12:00 pm';
+    }
   };
 
   return (
@@ -133,7 +143,9 @@ const EventCard = ({ event, onPress }) => {
             <Text style={styles.eventTime}>{formatDate(event.date) || '12:00 pm'}</Text>
           </View>
           <View style={styles.eventMetaItem}>
-            <Text style={styles.eventLocation}>{event.location || 'Lugar'}</Text>
+            <Text style={styles.eventLocation}>
+              {event.place || event.location || 'Lugar'}
+            </Text>
           </View>
         </View>
       </View>

@@ -10,8 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert
+  Animated
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterScreen = ({ navigation }) => {
@@ -19,6 +20,14 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [registerError, setRegisterError] = useState('');
+  const [shakeAnimation] = useState(new Animated.Value(0));
   const { register, error, isLoading, clearError } = useAuth();
 
   // Limpiar errores cuando se desmonta el componente
@@ -28,41 +37,135 @@ const RegisterScreen = ({ navigation }) => {
     };
   }, []);
 
-  const validateEmail = (email) => {
+  // Efecto para actualizar el error de registro cuando cambia el error del contexto
+  useEffect(() => {
+    if (error) {
+      if (error.includes('correo') || error.includes('email') || error.includes('existe')) {
+        setEmailError(error);
+      } else {
+        setRegisterError(error);
+        startShakeAnimation();
+      }
+    }
+  }, [error]);
+
+  // Limpiar errores específicos cuando cambian los campos
+  useEffect(() => {
+    setNameError('');
+    setRegisterError('');
+  }, [name]);
+
+  useEffect(() => {
+    setEmailError('');
+    setRegisterError('');
+  }, [email]);
+
+  useEffect(() => {
+    setPasswordError('');
+    setRegisterError('');
+    if (confirmPassword && password !== confirmPassword) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+    } else {
+      setConfirmPasswordError('');
+    }
+  }, [password]);
+
+  useEffect(() => {
+    if (password !== confirmPassword && confirmPassword) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+    } else {
+      setConfirmPasswordError('');
+    }
+  }, [confirmPassword]);
+
+  const startShakeAnimation = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: -10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 0, duration: 50, useNativeDriver: true })
+    ]).start();
+  };
+
+  const validateName = () => {
+    if (!name.trim()) {
+      setNameError('El nombre es obligatorio');
+      return false;
+    }
+    setNameError('');
+    return true;
+  };
+
+  const validateEmail = () => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    if (!email.trim()) {
+      setEmailError('El correo electrónico es obligatorio');
+      return false;
+    } else if (!re.test(email)) {
+      setEmailError('Introduce un correo electrónico válido');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validatePassword = () => {
+    if (!password) {
+      setPasswordError('La contraseña es obligatoria');
+      return false;
+    } else if (password.length < 8) {
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
+  const validateConfirmPassword = () => {
+    if (!confirmPassword) {
+      setConfirmPasswordError('Confirma tu contraseña');
+      return false;
+    } else if (password !== confirmPassword) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+      return false;
+    }
+    setConfirmPasswordError('');
+    return true;
   };
 
   const handleRegister = async () => {
-    // Validación
-    if (!name.trim()) {
-      Alert.alert('Error', 'Por favor ingresa tu nombre');
-      return;
-    }
-    if (!email.trim()) {
-      Alert.alert('Error', 'Por favor ingresa tu correo electrónico');
-      return;
-    }
-    if (!validateEmail(email)) {
-      Alert.alert('Error', 'Por favor ingresa un correo electrónico válido');
-      return;
-    }
-    if (!password) {
-      Alert.alert('Error', 'Por favor ingresa una contraseña');
-      return;
-    }
-    if (password.length < 8) {
-      Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres');
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
+    // Limpiar errores previos
+    setRegisterError('');
+    
+    // Validar todos los campos
+    const isNameValid = validateName();
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+    const isConfirmPasswordValid = validateConfirmPassword();
+    
+    if (!isNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return;
     }
 
-    const success = await register(name, email, password);
-    if (!success && error) {
-      Alert.alert('Error de registro', error);
+    try {
+      const success = await register(name, email, password);
+      
+      if (!success) {
+        if (error) {
+          if (error.includes('correo') || error.includes('email') || error.includes('existe')) {
+            setEmailError(error);
+          } else {
+            setRegisterError(error);
+            startShakeAnimation();
+          }
+        } else {
+          setRegisterError('Error al registrar usuario. Por favor, intenta de nuevo.');
+          startShakeAnimation();
+        }
+      }
+    } catch (err) {
+      setRegisterError('Ha ocurrido un error. Por favor, intenta de nuevo más tarde.');
+      console.error('Register error:', err);
     }
   };
 
@@ -86,74 +189,130 @@ const RegisterScreen = ({ navigation }) => {
           Crea una cuenta para acceder a los eventos
         </Text>
 
+        {/* Mostrar error general de registro */}
+        {registerError ? (
+          <Animated.View 
+            style={[
+              styles.errorContainer,
+              { transform: [{ translateX: shakeAnimation }] }
+            ]}
+          >
+            <Ionicons name="alert-circle" size={20} color="#ff4757" />
+            <Text style={styles.errorText}>{registerError}</Text>
+          </Animated.View>
+        ) : null}
+
         <View style={styles.formContainer}>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Nombre</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nombre completo"
-              value={name}
-              onChangeText={setName}
-              testID="name-input"
-            />
+            <View style={[styles.inputContainer, nameError ? styles.inputContainerError : null]}>
+              <Ionicons name="person-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Nombre completo"
+                value={name}
+                onChangeText={setName}
+                onBlur={validateName}
+                testID="name-input"
+              />
+            </View>
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
           </View>
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Correo electrónico</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Correo electrónico"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              testID="email-input"
-            />
+            <View style={[styles.inputContainer, emailError ? styles.inputContainerError : null]}>
+              <Ionicons name="mail-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Correo electrónico"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onBlur={validateEmail}
+                testID="email-input"
+              />
+            </View>
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
           </View>
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Contraseña"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              testID="password-input"
-            />
-            <Text style={styles.helperText}>Mínimo 8 caracteres</Text>
+            <View style={[styles.inputContainer, passwordError ? styles.inputContainerError : null]}>
+              <Ionicons name="lock-closed-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                onBlur={validatePassword}
+                testID="password-input"
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                <Ionicons 
+                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                  size={20} 
+                  color="#999" 
+                />
+              </TouchableOpacity>
+            </View>
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : (
+              <Text style={styles.helperText}>Mínimo 8 caracteres</Text>
+            )}
           </View>
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Confirmar contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar contraseña"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              testID="confirm-password-input"
-            />
+            <View style={[styles.inputContainer, confirmPasswordError ? styles.inputContainerError : null]}>
+              <Ionicons name="lock-closed-outline" size={20} color="#999" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                onBlur={validateConfirmPassword}
+                testID="confirm-password-input"
+              />
+              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeIcon}>
+                <Ionicons 
+                  name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} 
+                  size={20} 
+                  color="#999" 
+                />
+              </TouchableOpacity>
+            </View>
+            {confirmPasswordError ? (
+              <Text style={styles.errorText}>{confirmPasswordError}</Text>
+            ) : null}
           </View>
 
           <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleRegister}
-            disabled={isLoading}
-            testID="register-button">
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Registrarse</Text>
-            )}
-          </TouchableOpacity>
+  style={[styles.primaryButton, (nameError || emailError || passwordError || confirmPasswordError) && styles.disabledButton]}
+  onPress={handleRegister}
+  disabled={isLoading || !!nameError || !!emailError || !!passwordError || !!confirmPasswordError}
+  testID="register-button">
+  {isLoading ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={styles.buttonText}>Registrarse</Text>
+  )}
+</TouchableOpacity>
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('Login')}
             style={styles.loginContainer}
           >
             <Text style={styles.loginText}>
-              ¿Ya tienes una cuenta? <Text style={styles.loginLink}>Inicia sesión</Text>
+              ¿Ya tienes cuenta? <Text style={styles.loginLink}>Inicia sesión</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -207,13 +366,27 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 50,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    paddingHorizontal: 15,
     backgroundColor: '#fff',
+  },
+  inputContainerError: {
+    borderColor: '#ff4757',
+  },
+  inputIcon: {
+    marginLeft: 15,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 15,
     fontSize: 16,
   },
   helperText: {
@@ -221,18 +394,36 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 5,
   },
+  errorText: {
+    fontSize: 12,
+    color: '#ff4757',
+    marginTop: 5,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffe8e8',
+    borderWidth: 1,
+    borderColor: '#ff4757',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+  },
   primaryButton: {
     backgroundColor: '#6c5ce7',
     borderRadius: 8,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
+  },
+  disabledButton: {
+    backgroundColor: '#a29bea',
   },
   buttonText: {
     color: '#fff',

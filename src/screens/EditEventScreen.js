@@ -11,7 +11,8 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -29,7 +30,9 @@ const EditEventScreen = ({ route, navigation }) => {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [mainImage, setMainImage] = useState(null);
   const [mainImageUrl, setMainImageUrl] = useState('');
   const [logo, setLogo] = useState(null);
@@ -49,7 +52,11 @@ const EditEventScreen = ({ route, navigation }) => {
           setSubtitle(eventData.subtitle || '');
           setDescription(eventData.description || '');
           setLocation(eventData.location || '');
-          setDate(eventData.date ? new Date(eventData.date) : new Date());
+          
+          // Separar fecha y hora si vienen juntas
+          const eventDate = eventData.date ? new Date(eventData.date) : new Date();
+          setDate(eventDate);
+          setTime(eventDate); // Inicializa la hora con la misma fecha
           
           if (eventData.mainImage) {
             setMainImageUrl(eventData.mainImage);
@@ -124,11 +131,30 @@ const EditEventScreen = ({ route, navigation }) => {
     }
   };
   
+  // Abrir selector de fecha
+  const openDatePicker = () => {
+    setShowDatePicker(true);
+  };
+
+  // Abrir selector de hora
+  const openTimePicker = () => {
+    setShowTimePicker(true);
+  };
+
   // Manejar cambio de fecha
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios');
-    setDate(currentDate);
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (event.type === 'set' && selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  // Manejar cambio de hora
+  const handleTimeChange = (event, selectedTime) => {
+    setShowTimePicker(false);
+    if (event.type === 'set' && selectedTime) {
+      setTime(selectedTime);
+    }
   };
   
   // Subir imágenes
@@ -185,13 +211,23 @@ const EditEventScreen = ({ route, navigation }) => {
     if (!validateForm()) return;
     
     try {
+      // Combinar fecha y hora
+      const combinedDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes(),
+        time.getSeconds()
+      );
+      
       // Preparar datos del evento
       const eventData = {
         title,
         subtitle,
         description,
         location,
-        date: date.toISOString(),
+        date: combinedDate.toISOString(),
       };
       
       // Actualizar el evento
@@ -307,33 +343,112 @@ const EditEventScreen = ({ route, navigation }) => {
               />
             </View>
             
-            {/* Fecha y hora */}
+            {/* Fecha */}
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Fecha y Hora*</Text>
+              <Text style={styles.label}>Fecha*</Text>
               <TouchableOpacity
                 style={styles.datePickerButton}
-                onPress={() => setShowDatePicker(true)}>
+                onPress={openDatePicker}>
                 <Text style={styles.dateText}>
-                  {date.toLocaleString('es-ES', {
+                  {date.toLocaleDateString('es-ES', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
                   })}
                 </Text>
                 <Ionicons name="calendar-outline" size={20} color="#6c5ce7" />
               </TouchableOpacity>
-              
-              {showDatePicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="datetime"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
             </View>
+
+            {/* Hora */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Hora*</Text>
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={openTimePicker}>
+                <Text style={styles.dateText}>
+                  {time.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+                <Ionicons name="time-outline" size={20} color="#6c5ce7" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Date Picker para Android */}
+            {Platform.OS === 'android' && showDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date || new Date()}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
+
+            {Platform.OS === 'android' && showTimePicker && (
+              <DateTimePicker
+                testID="timePicker"
+                value={time || new Date()}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onChange={handleTimeChange}
+              />
+            )}
+            
+            {/* Modal Date Picker para iOS */}
+            {Platform.OS === 'ios' && (
+              <Modal
+                transparent={true}
+                visible={showDatePicker || showTimePicker}
+                animationType="slide"
+                onRequestClose={() => {
+                  setShowDatePicker(false);
+                  setShowTimePicker(false);
+                }}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    {showDatePicker && (
+                      <DateTimePicker
+                        testID="dateTimePicker"
+                        value={date || new Date()}
+                        mode="date"
+                        display="spinner"
+                        onChange={(event, selectedDate) => {
+                          handleDateChange(event, selectedDate);
+                          setShowDatePicker(false);
+                        }}
+                      />
+                    )}
+                    {showTimePicker && (
+                      <DateTimePicker
+                        testID="timePicker"
+                        value={time || new Date()}
+                        mode="time"
+                        is24Hour={true}
+                        display="spinner"
+                        onChange={(event, selectedTime) => {
+                          handleTimeChange(event, selectedTime);
+                          setShowTimePicker(false);
+                        }}
+                      />
+                    )}
+                    <TouchableOpacity 
+                      style={styles.modalCloseButton}
+                      onPress={() => {
+                        setShowDatePicker(false);
+                        setShowTimePicker(false);
+                      }}
+                    >
+                      <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            )}
             
             {/* Imagen principal */}
             <View style={styles.formGroup}>
@@ -574,6 +689,44 @@ const styles = StyleSheet.create({
   updateButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  modalButton: {
+    backgroundColor: '#6c5ce7',
+    paddingHorizontal: 30,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalCloseButton: {
+    backgroundColor: '#6c5ce7',
+    padding: 15,
+    alignItems: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  modalCloseButtonText: {
+    color: 'white',
     fontWeight: 'bold',
   },
 });
