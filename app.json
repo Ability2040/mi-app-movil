@@ -19,11 +19,18 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fortino.snack501a37b5807445fd947ce96d1665e114"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Producto 1. Diseño de una aplicación móvil"
+    "description": "Producto 1. Diseño de una aplicación móvil",
+    "extra": {
+      "eas": {
+        "projectId": "534bba21-0f69-49fa-aeab-01af1ba16371"
+      }
+    },
+    "owner": "fortino"
   }
 }
