@@ -1,0 +1,86 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Expo and React Native
+/.expo
+/android/app/build
+/ios/Pods
+/ios/build
+/web-build
+
+# Caches
+/.jest
+/.eslintcache
+/.prettiercache
+/dist
+/build
+
+# Logs
+*.log
+*.txt
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Local environment variables
+.env.local
+.env.*.local
+
+# Credentials
+*.pem
+*.pfx
+
+# Other
+/tmp
+/temp
+*.swp
+*.lock
+*.sqlite
+*.sqlite-*
+/coverage
+
+#VSCode
+.vscode/
+
+# Expo device files
+devices.json
