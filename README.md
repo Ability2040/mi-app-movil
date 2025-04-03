@@ -1,11 +1,3 @@
-# EventUp App
-
-## Descripción General
-
-EventUp es una aplicación móvil construida con React Native y Expo que permite a los usuarios descubrir, crear y gestionar eventos. La aplicación cuenta con un ecosistema completo para la gestión de eventos, incluyendo autenticación de usuarios, detalles de actividades, calificaciones y más.
-
-**Backend:** Esta aplicación utiliza un backend desplegado en Render. Puedes encontrar el repositorio del backend [aquí](https://github.com/netfoor/backend-app-events.git).
-
 # 📱 Nombre de la Aplicación: Eventup
 **Descripción:** La aplicación IventUp permite a los usuarios crear, organizar y dar seguimiento a sus eventos diarias de forma sencilla.
 Con una interfaz simple e intuitiva, los usuarios pueden categorizar sus eventos, establecer prioridades y fechas de vencimiento, lo que facilita
@@ -49,7 +41,13 @@ Puedes visualizar los wireframes de la aplicación en los siguientes enlaces:
 ## 📂 Repositorio GitHub  
 Enlace al repositorio: [GitHub Repo](https://github.com/Ability2040/mi-app-movil)
 
+# EventUp App
 
+## Descripción General
+
+EventUp es una aplicación móvil construida con React Native y Expo que permite a los usuarios descubrir, crear y gestionar eventos. La aplicación cuenta con un ecosistema completo para la gestión de eventos, incluyendo autenticación de usuarios, detalles de actividades, calificaciones y más.
+
+**Backend:** Esta aplicación utiliza un backend desplegado en Render. Puedes encontrar el repositorio del backend [aquí](https://github.com/netfoor/backend-app-events.git).
 
 ## Características
 
