@@ -16,6 +16,8 @@ El objetivo de EventUp es proporcionar una herramienta sencilla y eficiente para
 
 El backend está desplegado en Render y proporciona todas las APIs necesarias para el funcionamiento de la aplicación.
 
+Punto de acceso: https://backend-app-events.onrender.com
+
 ![alt text](image-1.png)
 
 *   **Repositorio:** [Backend EventUp](https://github.com/netfoor/backend-app-events.git)
