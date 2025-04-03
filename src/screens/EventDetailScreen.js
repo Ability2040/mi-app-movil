@@ -58,8 +58,12 @@ const EventDetailScreen = ({ route, navigation }) => {
   const fetchMainImage = async () => {
     try {
       const image = await photoService.getMainImage('Event', eventId);
-      if (image) {
+      
+      if (image && image.imageData) {
+        console.log('Setting main image from AsyncStorage');
         setMainImage(image.imageData);
+      } else {
+        console.log('No image data found in AsyncStorage');
       }
     } catch (error) {
       console.error('Error fetching main event image:', error);
@@ -74,22 +78,7 @@ useEffect(() => {
   }
 }, [eventId]);
 
-// Then in your render function, use mainImage to display the event image
-<Image 
-  source={{ 
-    uri: mainImage || 'https://via.placeholder.com/350x150?text=No+Image' 
-  }}
-  style={styles.headerImage}
-  resizeMode="cover"
-/>
   
-  // Call this in useEffect
-  useEffect(() => {
-    if (eventId) {
-      fetchMainImage();
-      fetchEventPhotos();
-    }
-  }, [eventId]);
 
   useEffect(() => {
     loadEventData();
@@ -1126,11 +1115,10 @@ useEffect(() => {
       </View>
     );
   }
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#f5f5f5" barStyle="dark-content" />
-
+  
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity
@@ -1138,15 +1126,16 @@ useEffect(() => {
             onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-
-          <Image
-            source={{
-              uri:
-                currentEvent.mainImage ||
+  
+        <Image
+          source={{
+            uri: mainImage || 
+                (currentEvent && currentEvent.mainImage) ||
                 'https://via.placeholder.com/400x200?text=Evento',
-            }}
-            style={styles.headerImage}
-          />
+          }}
+          style={styles.headerImage}
+          resizeMode="cover"
+        />
         </View>
 
         <View style={styles.content}>

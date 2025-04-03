@@ -125,10 +125,8 @@ export const EventProvider = ({ children }) => {
       // Upload the logo if provided
       if (logo && newEvent && newEvent._id) {
         try {
-          // Add logo upload method to photoService if needed
-          // await photoService.uploadLogo('Event', newEvent._id, logo);
-          // or just use the same method with different entity type
-          await photoService.uploadPhoto('EventLogo', newEvent._id, logo);
+          // Usar el nuevo método específico para logos
+          await photoService.setLogo('Event', newEvent._id, logo);
           console.log('Successfully uploaded logo for event');
         } catch (logoError) {
           console.error('Error uploading event logo:', logoError);
@@ -146,7 +144,7 @@ export const EventProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
-
+  
   // Actualizar un evento existente (sin las imágenes)
   const updateEvent = async (eventId, eventData) => {
     setIsLoading(true);

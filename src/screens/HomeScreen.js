@@ -15,9 +15,65 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEvents } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 import photoService from '../services/photoService';
-
+import { ratingService } from '../services/api';
 
 const EventCard = ({ event, onPress }) => {
+  // Estados existentes
+  const [mainImage, setMainImage] = useState(null);
+  const [imageLoading, setImageLoading] = useState(true);
+  // Nuevo estado para calificaciones
+  const [eventRating, setEventRating] = useState(0);
+  const [loadingRating, setLoadingRating] = useState(true);
+  
+  // Cargamos la imagen desde AsyncStorage cuando el componente se monta
+  useEffect(() => {
+    const loadEventImage = async () => {
+      try {
+        if (event && event._id) {
+          setImageLoading(true);
+          const image = await photoService.getMainImage('Event', event._id);
+          if (image && image.imageData) {
+            console.log(`Imagen cargada desde AsyncStorage para evento ${event._id}`);
+            setMainImage(image.imageData);
+          } else {
+            console.log(`No se encontró imagen en AsyncStorage para evento ${event._id}`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error al cargar imagen para evento ${event._id}:`, error);
+      } finally {
+        setImageLoading(false);
+      }
+    };
+    
+    loadEventImage();
+  }, [event]);
+
+  // Nuevo useEffect para cargar calificaciones
+  useEffect(() => {
+    const fetchEventRating = async () => {
+      try {
+        if (event && event._id) {
+          setLoadingRating(true);
+          const response = await ratingService.getRatings('Event', event._id);
+          
+          if (response && response.stats && typeof response.stats.averageRating === 'number') {
+            setEventRating(response.stats.averageRating);
+          } else {
+            setEventRating(0); // Valor por defecto
+          }
+        }
+      } catch (error) {
+        console.error(`Error al cargar calificaciones para evento ${event._id}:`, error);
+        setEventRating(0);
+      } finally {
+        setLoadingRating(false);
+      }
+    };
+    
+    fetchEventRating();
+  }, [event]);
+
   // Calcular estrellas en base a la calificación
   const renderStars = (rating) => {
     const stars = [];
@@ -47,16 +103,30 @@ const EventCard = ({ event, onPress }) => {
 
   return (
     <TouchableOpacity style={styles.eventCard} onPress={onPress}>
-      <Image
-        source={{ uri: event.mainImage || 'https://via.placeholder.com/400x200?text=Evento' }}
-        style={styles.eventImage}
-        resizeMode="cover"
-      />
+      {imageLoading ? (
+        <View style={[styles.eventImage, styles.loadingContainer]}>
+          <ActivityIndicator size="small" color="#6c5ce7" />
+        </View>
+      ) : (
+        <Image
+          source={{ 
+            uri: mainImage || event.mainImage || 'https://via.placeholder.com/400x200?text=Evento' 
+          }}
+          style={styles.eventImage}
+          resizeMode="cover"
+        />
+      )}
       <View style={styles.eventContent}>
         <Text style={styles.eventTitle}>{event.title || 'Título del evento'}</Text>
         <Text style={styles.eventSubtitle}>{event.subtitle || 'Subtítulo del evento'}</Text>
         
-        {renderStars(event.rating)}
+        {loadingRating ? (
+          <View style={styles.starsContainer}>
+            <ActivityIndicator size="small" color="#FFD700" />
+          </View>
+        ) : (
+          renderStars(eventRating)
+        )}
         
         <View style={styles.eventMetaContainer}>
           <View style={styles.eventMetaItem}>
@@ -226,6 +296,10 @@ const styles = StyleSheet.create({
     height: 180,
     backgroundColor: '#f0f0f0',
   },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   eventContent: {
     padding: 16,
   },
@@ -313,6 +387,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
