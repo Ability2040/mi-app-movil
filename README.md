@@ -1,55 +1,67 @@
-# 📱 Nombre de la Aplicación: Eventup
-**Descripción:** La aplicación IventUp permite a los usuarios crear, organizar y dar seguimiento a sus eventos diarias de forma sencilla.
-Con una interfaz simple e intuitiva, los usuarios pueden categorizar sus eventos, establecer prioridades y fechas de vencimiento, lo que facilita
-una mejor gestión del tiempo y el cumplimiento de objetivos. Ideal para personas que buscan mejorar su productividad personal o en equipo. 
+# 📱 EventUp
+
+**Descripción:** EventUp es una aplicación móvil que permite a los usuarios descubrir, crear y gestionar eventos de forma sencilla. Con una interfaz intuitiva, los usuarios pueden organizar eventos, establecer fechas, agregar participantes y dar seguimiento a sus actividades, facilitando una mejor gestión del tiempo y la organización personal o en equipo.
 
 ## 🎯 Objetivo General
-El objetivo de TaskMaster es proporcionar una herramienta sencilla y eficiente para la gestión de eventos diarias. Busca ayudar a los usuarios a 
-mantenerse organizados al permitirles crear, categorizar y seguir el progreso de sus eventos, mejorando así su productividad personal. La aplicación 
-tiene como propósito facilitar la visualización y priorización de eventos, optimizando el tiempo y los esfuerzos para cumplir con los objetivos diarios.
+
+El objetivo de EventUp es proporcionar una herramienta sencilla y eficiente para la gestión de eventos. Busca ayudar a los usuarios a mantenerse organizados al permitirles crear, categorizar y seguir el progreso de sus eventos, mejorando así su productividad personal. La aplicación facilita la visualización y priorización de actividades, optimizando el tiempo y los esfuerzos para cumplir con los objetivos.
 
 ## 🏗️ Arquitectura de la Aplicación
-- Tipo de arquitectura: Estructura Modular
 
-- Justificación: Se eligió una arquitectura monolítica para simplificar el desarrollo y mantenimiento de la aplicación en esta fase inicial. Al ser una aplicación 
-pequeña y con pocos requerimientos complejos, una arquitectura monolítica permite un desarrollo más rápido, sin necesidad de gestionar múltiples servicios o 
-bases de datos. Además, facilita la integración de nuevas funcionalidades y la resolución de errores, ya que toda la lógica está centralizada en un solo lugar.
+*   **Tipo de arquitectura:** Estructura Modular
+
+*   **Justificación:** Se eligió una arquitectura monolítica para simplificar el desarrollo y mantenimiento de la aplicación en esta fase inicial. Al ser una aplicación con requerimientos específicos, una arquitectura monolítica permite un desarrollo más rápido, sin necesidad de gestionar múltiples servicios. Facilita la integración de nuevas funcionalidades y la resolución de errores, ya que toda la lógica está centralizada.
+
+## 🔧 Backend
+
+El backend está desplegado en Render y proporciona todas las APIs necesarias para el funcionamiento de la aplicación.
+
+![alt text](image-1.png)
+
+*   **Repositorio:** [Backend EventUp](https://github.com/netfoor/backend-app-events.git)
+*   **Base de datos:** MongoDB Atlas (base de datos NoSQL en la nube)
+
+![alt text](image-2.png)
+
+*   **Tecnologías principales:**
+    *   Node.js con Express
+    *   Mongoose para gestión de MongoDB
+    *   JWT para autenticación
+*   **API endpoints principales:**
+    *   `/api/auth`: Autenticación de usuarios (registro, login)
+    *   `/api/events`: CRUD de eventos
+    *   `/api/activities`: Gestión de actividades
+    *   `/api/ratings`: Sistema de calificaciones
 
 ## 🚀 Framework de Desarrollo
-- **Framework:** React Native con Expo
-- **Justificación:** Se eligió React Native debido a su capacidad para desarrollar aplicaciones móviles tanto para iOS como para Android utilizando una sola base de código. Esto reduce significativamente el tiempo y el esfuerzo de desarrollo. Expo se utiliza para facilitar la configuración y el despliegue de la aplicación, 
-ya que ofrece  herramientas y una amplia variedad de bibliotecas listas para usar, lo que hace que el desarrollo sea aún más rápido y sencillo.
+
+*   **Framework:** React Native con Expo
+*   **Justificación:** Se eligió React Native debido a su capacidad para desarrollar aplicaciones móviles tanto para iOS como para Android utilizando una sola base de código. Esto reduce significativamente el tiempo y el esfuerzo de desarrollo. Expo se utiliza para facilitar la configuración y el despliegue de la aplicación, ya que ofrece herramientas y bibliotecas listas para usar.
 
 ## 🗂️ Estrategia de Versionamiento
 
-Versionamiento por ramas
-- `main` → Rama principal con la documentación.
-- `Israel` → Israel
-- `Fortino` → Fortino
-- `Joel` → Joel
+Versionamiento por ramas:
 
+*   `main` → Rama principal con la documentación.
+*   `Israel` → Israel
+*   `Fortino` → Fortino
+*   `Joel` → Joel
 
-## 🎨 Wireframes/Mockups 
-Puedes visualizar los wireframes de la aplicación en los siguientes enlaces:  
-- [🎨 Diseño en Figma](https://www.figma.com/design/KC9NbaHgOQnRA2Sf7iZi3x/AgendaProject-(Copy))  
-- [📱 Prototipo interactivo](https://www.figma.com/proto/KC9NbaHgOQnRA2Sf7iZi3x/AgendaProject-(Copy)?node-id=181-3604&p=f&t=gc643fMwi9xs5Oeu-1&scaling=scale-down&content-scaling=fixed&page-id=181%3A3592&starting-point-node-id=181%3A3621)
+## 🎨 Wireframes/Mockups
 
-## Diagrama de flujo
-- Se agrego a la carpeta Diseños
+Puedes visualizar los wireframes de la aplicación en los siguientes enlaces:
 
+*   🎨 [Diseño en Figma](link_del_diseño_figma)
+*   📱 [Prototipo interactivo](link_del_prototipo)
+*   📊 [Diagrama de flujo](link_del_diagrama)
 
-## 📂 Repositorio GitHub  
-Enlace al repositorio: [GitHub Repo](https://github.com/Ability2040/mi-app-movil)
+Se encuentra disponible en la carpeta `Diseños`
 
-# EventUp App
+## 📂 Repositorio GitHub
 
-## Descripción General
+[Enlace al repositorio: GitHub Repo](https://github.com/Ability2040/mi-app-movil.git)
 
-EventUp es una aplicación móvil construida con React Native y Expo que permite a los usuarios descubrir, crear y gestionar eventos. La aplicación cuenta con un ecosistema completo para la gestión de eventos, incluyendo autenticación de usuarios, detalles de actividades, calificaciones y más.
-
-**Backend:** Esta aplicación utiliza un backend desplegado en Render. Puedes encontrar el repositorio del backend [aquí](https://github.com/netfoor/backend-app-events.git).
-
-## Características
+## ✨ Características
 
 *   **Autenticación de Usuarios:** Sistema seguro de inicio de sesión y registro.
 *   **Gestión de Eventos:** Crear, ver y participar en eventos.
@@ -57,7 +69,7 @@ EventUp es una aplicación móvil construida con React Native y Expo que permite
 *   **Gestión de Asistentes:** Agregar y gestionar asistentes a eventos.
 *   **Sistema de Calificaciones:** Dejar y ver calificaciones para eventos y actividades.
 
-## Tecnologías Utilizadas
+## 🛠️ Tecnologías Utilizadas
 
 *   **Framework:** React Native con Expo
 *   **Navegación:** React Navigation
@@ -66,33 +78,37 @@ EventUp es una aplicación móvil construida con React Native y Expo que permite
 *   **Iconos:** Ionicons
 *   **Gestión de Activos:** Cargadores de Expo Asset y Font
 
-## Instalación y Configuración
+
+## ⚙️ Instalación y Configuración
 
 Sigue estos pasos para configurar y ejecutar la aplicación:
 
-1.  **Clonar el repositorio:**
+Clonar el repositorio:
 
-    ```bash
-    git clone <URL_del_repositorio>
-    cd <nombre_del_proyecto>
-    ```
-2.  **Instalar dependencias:**
+```bash
+git clone <url_del_repositorio>
+cd app_eventup
+```
 
-    ```bash
-    npm install
-    # o
-    yarn install
-    ```
-3.  **Iniciar el servidor de desarrollo:**
+Instalar dependencias:
 
-    ```bash
-    npm start
-    # o
-    yarn start
-    ```
-4.  **Usar la aplicación Expo Go:** En su dispositivo, use la aplicación Expo Go para escanear el código QR que aparece en la terminal, o use un emulador.
+```bash
+npm install
+# o
+yarn install
+```
 
-## Estructura del Proyecto
+Iniciar el servidor de desarrollo:
+
+```bash
+npm start
+# o
+yarn start
+```
+
+Usar la aplicación Expo Go: En su dispositivo, use la aplicación Expo Go para escanear el código QR que aparece en la terminal, o use un emulador.
+
+## 📁 Estructura del Proyecto
 
 ```
 app_eventup/
@@ -109,7 +125,7 @@ app_eventup/
 └── package.json        # Dependencias del proyecto
 ```
 
-## Desarrollo
+## 🧪 Desarrollo
 
 La aplicación utiliza Expo para simplificar el desarrollo. Puedes:
 
@@ -117,7 +133,23 @@ La aplicación utiliza Expo para simplificar el desarrollo. Puedes:
 *   Usar emuladores iOS/Android para desarrollo.
 *   Exportar a una aplicación independiente usando los servicios de construcción de Expo.
 
-## Contribuir
+## 📱 Archivo APK (ABB)
+
+La aplicación está disponible en formato ABB (Android App Bundle) a través de Expo Dev Builds. Esto permite una instalación y distribución más eficiente en dispositivos Android.
+
+Para construir el ABB:
+
+```bash
+npm run build:android:preview
+# o
+npm run build:android:prod
+```
+
+El archivo generado estará disponible en su cuenta de Expo, o puede descargarlo directamente desde el panel de Expo.
+
+![alt text](image.png)
+
+## 👥 Contribuir
 
 ¡Las contribuciones son bienvenidas! Sigue estos pasos:
 
@@ -127,6 +159,6 @@ La aplicación utiliza Expo para simplificar el desarrollo. Puedes:
 4.  Enviar a la rama (`git push origin feature/nueva-funcionalidad`).
 5.  Crear un nuevo Pull Request.
 
-## Licencia
+## 📄 Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT.
